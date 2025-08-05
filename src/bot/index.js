@@ -3,7 +3,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
-const config = require("./config.json");
+require("dotenv").config();
 
 let videoUrls = [];
 let lastViewedVideoIndex = 0;
@@ -62,7 +62,9 @@ app.use((req, res, next) => {
 
 client.once("ready", () => {
   console.log(`Bot de Discord listo como ${client.user.tag}!`);
-  console.log(`Monitoreando el canal con ID: ${config.targetChannelId}`);
+  console.log(
+    `Monitoreando el canal con ID: ${process.env.DISCORD_CHANNEL_ID}`
+  );
   loadState();
 });
 
@@ -72,7 +74,7 @@ const DISLIKE_EMOJI = "👎";
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  if (message.channel.id !== config.targetChannelId) {
+  if (message.channel.id !== process.env.DISCORD_CHANNEL_ID) {
     return;
   }
 
@@ -108,7 +110,7 @@ client.on("messageCreate", async (message) => {
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (user.bot) return;
 
-  if (reaction.message.channel.id !== config.targetChannelId) return;
+  if (reaction.message.channel.id !== process.env.DISCORD_CHANNEL_ID) return;
 
   const videoIndex = videoUrls.findIndex(
     (video) => video.id === reaction.message.id
@@ -126,7 +128,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 client.on(Events.MessageReactionRemove, async (reaction, user) => {
   if (user.bot) return;
 
-  if (reaction.message.channel.id !== config.targetChannelId) return;
+  if (reaction.message.channel.id !== process.env.DISCORD_CHANNEL_ID) return;
 
   const videoIndex = videoUrls.findIndex(
     (video) => video.id === reaction.message.id
@@ -191,19 +193,19 @@ app.post("/api/videos/mark-as-viewed", (req, res) => {
 });
 
 app.post("/api/ban", async (req, res) => {
-  if (config.banActive === false) return;
+  if (process.env.BAN_ACTIVE === false) return;
 
   const { videoId } = req.body;
   const userId = videoUrls.find((video) => video.id === videoId)?.userId;
 
   try {
-    const guild = client.guilds.cache.get(config.guildId);
+    const guild = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
     if (!guild) {
       res
         .status(404)
         .json({ status: "error", message: "Servidor no encontrado." });
       throw new Error(
-        "Servidor (Guild) no encontrado. Asegúrate de que guildId esté configurado correctamente en config.json."
+        "Servidor (Guild) no encontrado. Asegúrate de que guildId esté configurado correctamente en el archivo .env."
       );
     }
     const member = await guild.members.fetch(userId);
@@ -218,10 +220,10 @@ app.post("/api/ban", async (req, res) => {
   }
 });
 
-app.listen(config.expressPort, () => {
+app.listen(process.env.EXPRESS_PORT, () => {
   console.log(
-    `Servidor Express ejecutándose en http://localhost:${config.expressPort}`
+    `Servidor Express ejecutándose en http://localhost:${process.env.EXPRESS_PORT}`
   );
 });
 
-client.login(config.token);
+client.login(process.env.DISCORD_BOT_TOKEN);
