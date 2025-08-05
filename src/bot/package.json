@@ -1,0 +1,14 @@
+{
+  "name": "react-video-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "xhzdaniel",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "discord.js": "^14.21.0",
+    "express": "^4.21.2"
+  }
+}

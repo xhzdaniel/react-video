@@ -1,0 +1,16 @@
+{
+  "name": "react-video",
+  "version": "1.0.0",
+  "description": "React to video streaming",
+  "main": "index.js",
+  "scripts": {
+    "dev:web": "cd src/web && npm run dev",
+    "start:bot": "cd src/bot && npm run start",
+    "start": "concurrently \"npm run dev:web\" \"npm run start:bot\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
